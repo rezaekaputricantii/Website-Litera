@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LITERA - Platform E-Commerce & Marketplace Buku Bekas Makassar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        litera: {
+                            bg: '#f8f9fa',        // Background aplikasi lembut
+                            surface: '#e2e2e2',   // Surface abu-abu terang
+                            gray: '#9b9b9b',      // Secondary neutral
+                            dark: '#4a4445',      // Dark slate
+                            black: '#111111',     // Hitam pekat untuk teks & aksen
+                            red: '#a62639',       // Merah Marun Utama (Palet)
+                            redhover: '#8b1e2e'   // Red hover state
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-litera-bg text-litera-black font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- HEADER & NAVIGASI UTAMA -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo Resmi LITERA -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
+                <div class="h-12 flex items-center justify-center">
+                    <div class="flex items-baseline font-serif tracking-tight">
+                        <span class="text-3xl font-extrabold text-litera-red">Lite</span>
+                        <div class="relative inline-block">
+                            <i class="fa-solid fa-book-open absolute -top-3 left-0 text-xs text-litera-black"></i>
+                            <span class="text-3xl font-extrabold text-litera-black">ra</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-l border-litera-gray pl-3 hidden sm:block">
+                    <span class="block text-xs font-bold text-litera-dark tracking-wider">LITERA</span>
+                    <span class="block text-[9px] uppercase tracking-wider text-litera-gray font-semibold">Digital Library & Hub</span>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8">
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-litera-gray">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari judul buku, penulis, jurusan..." class="w-full pl-10 pr-4 py-2 bg-litera-surface border border-transparent rounded-full text-sm text-litera-black focus:outline-none focus:bg-white focus:border-litera-red transition-all">
+                </div>
+            </div>
+
+            <!-- Actions & Cart -->
+            <div class="flex items-center space-x-4">
+                <button onclick="navigate('cart')" class="relative p-2 text-litera-dark hover:text-litera-red transition-colors">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-litera-red text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-xs">0</span>
+                </button>
+                <button onclick="navigate('titip-jual')" class="bg-litera-red hover:bg-litera-redhover text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Titip Jual / Barter</span>
+                </button>
+                <div class="h-6 w-[1px] bg-litera-surface"></div>
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="navigate('profile')">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-litera-red">
+                    <span class="hidden lg:inline text-xs font-semibold text-litera-dark">Reza Putri</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SUB NAVIGASI -->
+    <nav class="bg-white border-b border-litera-surface shadow-xs sticky top-20 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8 overflow-x-auto text-sm font-medium">
+            <button onclick="navigate('home')" id="nav-home" class="py-3 px-1 border-b-2 border-litera-red text-litera-red font-semibold whitespace-nowrap">Katalog & Promo</button>
+            <button onclick="navigate('orders')" id="nav-orders" class="py-3 px-1 border-b-2 border-transparent text-litera-dark hover:text-litera-black whitespace-nowrap">Lacak Pesanan (AWB)</button>
+            <button onclick="navigate('returns')" id="nav-returns" class="py-3 px-1 border-b-2 border-transparent text-litera-dark hover:text-litera-black whitespace-nowrap">Pengajuan Retur</button>
+            <button onclick="navigate('admin')" id="nav-admin" class="py-3 px-1 border-b-2 border-transparent text-litera-dark hover:text-litera-black whitespace-nowrap text-xs text-litera-red font-bold flex items-center space-x-1">
+                <i class="fa-solid fa-user-shield"></i><span>Admin Dashboard (Omnichannel)</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- PAGE 1: HOME & KATALOG -->
+        <div id="page-home" class="space-y-8">
+            <!-- Hero Banner Litera -->
+            <div class="bg-gradient-to-r from-litera-black via-litera-dark to-litera-red rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="max-w-2xl relative z-10 space-y-4">
+                    <span class="bg-litera-surface text-litera-black text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Khusus Mahasiswa Makassar, Gowa & Maros</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Hemat Kuliah dengan Beli, Titip Jual & Barter Buku Bekas</h1>
+                    <p class="text-litera-surface text-sm leading-relaxed">Platform perantara terpercaya dengan jaminan grading kondisi fisik jujur, ongkir terjangkau J&T/JNE, dan sistem pembayaran otomatis QRIS/Midtrans.</p>
+                </div>
+            </div>
+
+            <!-- Bundle Promotion Section -->
+            <div class="bg-white border border-litera-surface rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <div class="space-y-1">
+                    <span class="bg-litera-red text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">PAKET BUNDLING HEMAT</span>
+                    <h3 class="text-lg font-bold text-litera-black">Paket Cerdas Bisnis Digital (3 Buku Akademik & Filsafat)</h3>
+                    <p class="text-xs text-litera-dark">Dapatkan Filsafat Sains, Risalah Kebangkitan, & Filosofi Teras sekaligus!</p>
+                </div>
+                <div class="text-right sm:text-right flex items-center space-x-4">
+                    <div>
+                        <span class="text-xs text-litera-gray line-through">Rp 150.000</span>
+                        <span class="text-xl font-extrabold text-litera-red block">Rp 120.000</span>
+                    </div>
+                    <button onclick="addBundleToCart()" class="bg-litera-black hover:bg-litera-dark text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all">Beli Paket</button>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex items-center space-x-3 overflow-x-auto pb-2">
+                <button onclick="filterCat('All')" class="cat-filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-litera-red text-white shadow-xs whitespace-nowrap">Semua Koleksi</button>
+                <button onclick="filterCat('Fiksi')" class="cat-filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-litera-dark border border-litera-surface hover:bg-litera-surface transition-all whitespace-nowrap">Novel & Fiksi</button>
+                <button onclick="filterCat('Filsafat')" class="cat-filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-litera-dark border border-litera-surface hover:bg-litera-surface transition-all whitespace-nowrap">Filsafat & Self-Improvement</button>
+                <button onclick="filterCat('Agama')" class="cat-filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-litera-dark border border-litera-surface hover:bg-litera-surface transition-all whitespace-nowrap">Agama & Studi Islam</button>
+                <button onclick="filterCat('Bisnis')" class="cat-filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-litera-dark border border-litera-surface hover:bg-litera-surface transition-all whitespace-nowrap">Bisnis & Manajemen</button>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Rendered -->
+            </div>
+        </div>
+
+        <!-- PAGE 2: PRODUCT DETAIL (PDP) -->
+        <div id="page-pdp" class="hidden space-y-8 max-w-5xl mx-auto">
+            <button onclick="navigate('home')" class="text-xs text-litera-dark hover:text-litera-red flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left"></i><span>Kembali ke Katalog</span>
+            </button>
+
+            <div class="bg-white rounded-2xl p-6 border border-litera-surface shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Visual Gallery -->
+                <div class="space-y-4">
+                    <div class="h-96 bg-litera-bg rounded-xl overflow-hidden border border-litera-surface flex items-center justify-center p-2">
+                        <img id="pdp-img" src="" class="max-h-full object-contain">
+                    </div>
+                    <div class="p-3 bg-litera-surface rounded-xl border border-litera-gray text-xs text-litera-dark flex items-start space-x-2">
+                        <i class="fa-solid fa-shield-cat text-lg mt-0.5 text-litera-red"></i>
+                        <span><strong>Garansi Kejujuran Fisik Litera:</strong> Foto memperlihatkan kondisi fisik asli buku (sampul, halaman, & coretan) tanpa diedit.</span>
+                    </div>
+                </div>
+
+                <!-- Info & CTA -->
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span id="pdp-category" class="bg-litera-surface text-litera-black text-[10px] font-bold px-2.5 py-0.5 rounded-full">Kategori</span>
+                            <span id="pdp-grade" class="bg-litera-dark text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">Grade A</span>
+                        </div>
+                        <h1 id="pdp-title" class="text-2xl font-bold text-litera-black mt-2">Judul Buku</h1>
+                        <p id="pdp-author" class="text-xs text-litera-gray mt-1">Penulis</p>
+                    </div>
+
+                    <div class="border-y border-litera-surface py-3 flex items-baseline space-x-3">
+                        <span id="pdp-price" class="text-3xl font-extrabold text-litera-red">Rp 0</span>
+                        <span class="text-xs text-litera-gray">Komisi Litera Transparan (Rp15.000)</span>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-bold text-litera-dark uppercase mb-2">Deskripsi & Catatan Fisik</h4>
+                        <p id="pdp-desc" class="text-xs text-litera-dark leading-relaxed whitespace-pre-line">Deskripsi buku...</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-litera-surface flex items-center space-x-3">
+                        <button onclick="addCurrentPdpToCart()" class="flex-1 bg-litera-red hover:bg-litera-redhover text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-cart-plus"></i><span>Tambah ke Keranjang</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: CHECKOUT & LOGISTIK -->
+        <div id="page-cart" class="hidden space-y-8 max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-litera-black">Checkout & Pemilihan Logistik</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Cart Items & Shipping Form -->
+                <div class="md:col-span-2 space-y-6">
+                    <!-- Shipping Address Form -->
+                    <div class="bg-white p-5 rounded-2xl border border-litera-surface shadow-xs space-y-4">
+                        <h3 class="font-bold text-sm text-litera-black flex items-center space-x-2">
+                            <i class="fa-solid fa-location-dot text-litera-red"></i><span>Alamat Pengiriman (Sulawesi Selatan)</span>
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <input type="text" id="cust-name" placeholder="Nama Lengkap" value="Reza Eka Putri" class="p-2.5 bg-litera-bg border border-litera-surface rounded-lg">
+                            <input type="text" id="cust-phone" placeholder="No. WhatsApp" value="08123456789" class="p-2.5 bg-litera-bg border border-litera-surface rounded-lg">
+                            <select id="cust-region" onchange="calculateShipping()" class="col-span-2 p-2.5 bg-litera-bg border border-litera-surface rounded-lg font-semibold">
+                                <option value="Makassar">Kota Makassar (Lokal)</option>
+                                <option value="Gowa">Kabupaten Gowa</option>
+                                <option value="Maros">Kabupaten Maros</option>
+                            </select>
+                            <textarea id="cust-address" rows="2" placeholder="Alamat Lengkap Kos/Rumah" class="col-span-2 p-2.5 bg-litera-bg border border-litera-surface rounded-lg">Jl. Tamalanrea Indah No. 12, Antang, Makassar</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Courier Selection -->
+                    <div class="bg-white p-5 rounded-2xl border border-litera-surface shadow-xs space-y-3">
+                        <h3 class="font-bold text-sm text-litera-black flex items-center space-x-2">
+                            <i class="fa-solid fa-truck-fast text-litera-red"></i><span>Mitra Ekspedisi & Last-Mile</span>
+                        </h3>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center justify-between p-3 border border-litera-surface rounded-xl cursor-pointer hover:bg-litera-bg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="courier" value="JNT" checked onchange="calculateShipping()">
+                                    <div>
+                                        <span class="font-bold block text-litera-black">J&T Express Reguler (1-2 Hari)</span>
+                                        <span class="text-[10px] text-litera-gray">Rekomendasi Hemat Kampus</span>
+                                    </div>
+                                </div>
+                                <span id="ongkir-jnt" class="font-bold text-litera-black">Rp 8.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 border border-litera-surface rounded-xl cursor-pointer hover:bg-litera-bg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="courier" value="JNE" onchange="calculateShipping()">
+                                    <div>
+                                        <span class="font-bold block text-litera-black">JNE Express (1-3 Hari)</span>
+                                        <span class="text-[10px] text-litera-gray">Jangkauan Luas</span>
+                                    </div>
+                                </div>
+                                <span id="ongkir-jne" class="font-bold text-litera-black">Rp 10.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 border border-litera-surface rounded-xl cursor-pointer hover:bg-litera-bg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="courier" value="PICKUP" onchange="calculateShipping()">
+                                    <div>
+                                        <span class="font-bold block text-litera-red">Click-and-Collect (Pickup Kampus UNM/Unhas)</span>
+                                        <span class="text-[10px] text-litera-gray">Gratis Ongkir + Bebas Emisi Karbon</span>
+                                    </div>
+                                </div>
+                                <span class="font-bold text-litera-red">GRATIS</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method (Midtrans Integration) -->
+                    <div class="bg-white p-5 rounded-2xl border border-litera-surface shadow-xs space-y-3">
+                        <h3 class="font-bold text-sm text-litera-black flex items-center space-x-2">
+                            <i class="fa-solid fa-wallet text-litera-red"></i><span>Metode Pembayaran (Midtrans Gateway)</span>
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <label class="p-3 border-2 border-litera-red rounded-xl flex items-center space-x-2 cursor-pointer bg-litera-bg">
+                                <input type="radio" name="payment" value="QRIS" checked>
+                                <div>
+                                    <span class="font-bold block text-litera-black">QRIS Dinamis (MDR 0,7%)</span>
+                                    <span class="text-[10px] text-litera-gray">GoPay, DANA, OVO, m-Banking</span>
+                                </div>
+                            </label>
+                            <label class="p-3 border border-litera-surface rounded-xl flex items-center space-x-2 cursor-pointer hover:bg-litera-bg">
+                                <input type="radio" name="payment" value="COD">
+                                <div>
+                                    <span class="font-bold block text-litera-black">COD (Bayar di Tempat)</span>
+                                    <span class="text-[10px] text-litera-gray">Khusus Wilayah Makassar</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary Side Card -->
+                <div class="bg-white p-5 rounded-2xl border border-litera-surface shadow-sm space-y-4 h-fit">
+                    <h3 class="font-bold text-sm text-litera-black border-b border-litera-surface pb-3">Ringkasan Pesanan</h3>
+                    <div id="cart-summary-items" class="space-y-2 text-xs text-litera-dark">
+                        <!-- Items list -->
+                    </div>
+                    <div class="border-t border-litera-surface pt-3 space-y-1.5 text-xs">
+                        <div class="flex justify-between text-litera-gray">
+                            <span>Subtotal Buku</span>
+                            <span id="subtotal-val">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-litera-gray">
+                            <span>Ongkos Kirim</span>
+                            <span id="ongkir-val">Rp 8.000</span>
+                        </div>
+                        <div class="flex justify-between text-base font-extrabold text-litera-black pt-2 border-t border-litera-surface">
+                            <span>Total Tagihan</span>
+                            <span id="total-val" class="text-litera-red">Rp 0</span>
+                        </div>
+                    </div>
+                    <button onclick="processCheckout()" class="w-full bg-litera-red hover:bg-litera-redhover text-white py-3 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-lock"></i><span>Bayar Sekarang (Midtrans)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 4: TRACKING ORDER (AWB) -->
+        <div id="page-orders" class="hidden space-y-6 max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold text-litera-black">Lacak Pengiriman Pesanan (AWB Tracking)</h2>
+            <div class="bg-white p-6 rounded-2xl border border-litera-surface shadow-sm space-y-6">
+                <div class="flex items-center justify-between border-b border-litera-surface pb-4">
+                    <div>
+                        <span class="text-xs text-litera-gray">Nomor Invoice: <strong class="text-litera-black">INV/LITERA/20261021/004</strong></span>
+                        <h3 class="text-lg font-bold text-litera-black">Resi J&T: <span class="text-litera-red">JT88920192001</span></h3>
+                    </div>
+                    <span class="bg-litera-surface text-litera-black text-xs font-bold px-3 py-1 rounded-full">Dalam Perjalanan</span>
+                </div>
+
+                <!-- 5-Stage Timeline Tracker -->
+                <div class="space-y-6 text-xs relative pl-6 border-l-2 border-litera-red">
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-litera-red border-2 border-white"></span>
+                        <p class="font-bold text-litera-black">Out for Delivery (Kurir menuju lokasi)</p>
+                        <p class="text-litera-gray">21 Okt 2026 - 14:30 WITA • Kurir J&T Makassar</p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-litera-red border-2 border-white"></span>
+                        <p class="font-bold text-litera-black">Diserahkan ke Kurir / Handover</p>
+                        <p class="text-litera-gray">21 Okt 2026 - 11:00 WITA • Hub Litera Tamalanrea</p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-litera-gray border-2 border-white"></span>
+                        <p class="font-bold text-litera-dark">Packing Selesai (QC Passed)</p>
+                        <p class="text-litera-gray">21 Okt 2026 - 09:15 WITA</p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-litera-gray border-2 border-white"></span>
+                        <p class="font-bold text-litera-dark">Pembayaran Terverifikasi (Midtrans QRIS)</p>
+                        <p class="text-litera-gray">21 Okt 2026 - 08:45 WITA</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 5: FORM PENGAJUAN RETUR -->
+        <div id="page-returns" class="hidden space-y-6 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-litera-black">Form Pengajuan Retur (Maks. 2x24 Jam)</h2>
+            <div class="bg-white p-6 rounded-2xl border border-litera-surface shadow-sm space-y-4">
+                <p class="text-xs text-litera-gray">Retur berlaku jika fisik buku cacat parah/terlepas yang tidak tertera pada deskripsi katalog.</p>
+                <form onsubmit="handleReturnSubmit(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="font-bold text-litera-dark block mb-1">Nomor Invoice / Order ID</label>
+                        <input type="text" required placeholder="Contoh: INV/LITERA/20261021/004" class="w-full p-2.5 bg-litera-bg border border-litera-surface rounded-lg">
+                    </div>
+                    <div>
+                        <label class="font-bold text-litera-dark block mb-1">Alasan Komplain</label>
+                        <select class="w-full p-2.5 bg-litera-bg border border-litera-surface rounded-lg">
+                            <option>Halaman buku sobek/hilang parah</option>
+                            <option>Judul buku tidak sesuai pesanan</option>
+                            <option>Buku basah saat pengiriman</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-litera-dark block mb-1">Upload Bukti Video Unboxing Utuh (Tanpa Jeda)</label>
+                        <input type="file" required class="w-full p-2 bg-litera-bg border border-litera-surface rounded-lg">
+                    </div>
+                    <button type="submit" class="w-full bg-litera-red hover:bg-litera-redhover text-white font-bold py-3 rounded-xl shadow-md transition-all">Kirim Ajuan Retur</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PAGE 6: ADMIN DASHBOARD (OMNICHANNEL) -->
+        <div id="page-admin" class="hidden space-y-8">
+            <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-litera-surface shadow-sm">
+                <div>
+                    <h2 class="text-xl font-bold text-litera-black">Dashboard Omnichannel Inventory LITERA</h2>
+                    <p class="text-xs text-litera-gray">Single Source of Truth (Database WooCommerce & Cloud RDS Sync)</p>
+                </div>
+                <button onclick="openModalAddBook()" class="bg-litera-red text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">+ Tambah Stok Buku</button>
+            </div>
+
+            <!-- Stock Table -->
+            <div class="bg-white rounded-2xl border border-litera-surface overflow-hidden shadow-sm">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-litera-surface text-litera-dark uppercase border-b border-litera-surface">
+                        <tr>
+                            <th class="p-4">Judul & Penulis</th>
+                            <th class="p-4">Kategori</th>
+                            <th class="p-4">Grade Kondisi</th>
+                            <th class="p-4">Harga</th>
+                            <th class="p-4">Stok Single-Source</th>
+                            <th class="p-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-stock-tbody" class="divide-y divide-litera-surface">
+                        <!-- Admin rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC FRONTEND -->
+    <script>
+        // Data Katalog 9 Buku berdasarkan Gambar
+        let books = [
+            {
+                id: 1,
+                title: "Risalah Kebangkitan - Penalaran terhadap Realitas Akhirat",
+                author: "Badiuzzaman Said Nursi",
+                category: "Agama",
+                grade: "Grade B+ (Layak Baca)",
+                price: 50000,
+                img:"foto buku/risalah kebangkitan.jpeg",
+                desc: "Judul: Risalah Kebangkitan – Penalaran terhadap Realitas Akhirat\nPenulis: Badiuzzaman Said Nursi (Risalah Nur Press)\nKondisi Fisik: Grade B+ (Layak Baca / Pre-loved Good Condition)\nDetail: Sudut cover kanan atas & bawah sedikit berlekuk/aus pemakaian wajar. Lembaran kertas dalam utuh, tidak ada halaman sobek, teks terbaca jelas."
+            },
+            {
+                id: 2,
+                title: "Namaku Alam",
+                author: "Leila S. Chudori",
+                category: "Fiksi",
+                grade: "Grade A (Mulus)",
+                price: 65000,
+                img: "foto buku/namaku alam.jpeg",
+                desc: "Judul: Namaku Alam\nPenulis: Leila S. Chudori (Penerbit KPG)\nKondisi Fisik: Grade A (Pre-loved Like New / Mulus Original)\nDetail: Cover tebal bersih, jilidan kuat, kertas bersih tanpa coretan atau stabilo."
+            },
+            {
+                id: 3,
+                title: "Animal Farm (Republik Hewan)",
+                author: "George Orwell",
+                category: "Fiksi",
+                grade: "Grade A (Mulus)",
+                price: 45000,
+                img: "foto buku/animal farm.jpeg",
+                desc: "Judul: Animal Farm (Republik Hewan)\nPenulis: George Orwell (Gramedia Pustaka Utama)\nKondisi Fisik: Grade A (Mulus Original)\nDetail: Novel alegori klasik populer. Sampul rapi dan halaman utuh."
+            },
+            {
+                id: 4,
+                title: "Angel & Demon",
+                author: "Helena Abidin, Suhartono C., Timoteus T.",
+                category: "Bisnis",
+                grade: "Grade A (Mulus)",
+                price: 50000,
+                img: "foto buku/angel & demon.jpeg",
+                desc: "Judul: Angel & Demon\nPenulis: Helena Abidin, Suhartono Chandra, Timoteus Talip (Grasindo)\nCatatan: National Bestseller dengan Pengantar oleh Wimar Witoelar.\nKondisi Fisik: Grade A (Preloved Mulus)."
+            },
+            {
+                id: 5,
+                title: "Filsafat Sains - Dari Newton, Einstein hingga Sains-Data",
+                author: "Dimitri Mahayana",
+                category: "Filsafat",
+                grade: "Grade B (Layak)",
+                price: 50000,
+                img: "foto buku/filsafat sains.jpeg",
+                desc: "Judul: Filsafat Sains – Dari Newton, Einstein hingga Sains-Data\nPenulis: Dimitri Mahayana\nKondisi Fisik: Grade B (Layak Baca / Lekukan di Sudut Cover)\nDetail: Halaman lengkap dan isi bacaan sangat jelas, cocok untuk mahasiswa referensi kuliah."
+            },
+            {
+                id: 6,
+                title: "Filosofi Teras - Filsafat Yunani-Romawi Kuno",
+                author: "Henry Manampiring",
+                category: "Filsafat",
+                grade: "Grade A (Mulus)",
+                price: 55000,
+                img: "foto buku/filosofi teras.jpeg",
+                desc: "Judul: Filosofi Teras\nPenulis: Henry Manampiring\nCatatan: National Best Seller Stoisisme Modern.\nKondisi Fisik: Grade A (Mulus & Original)."
+            },
+            {
+                id: 7,
+                title: "Tentang Kamu",
+                author: "Tere Liye",
+                category: "Fiksi",
+                grade: "Grade B+ (Layak)",
+                price: 50000,
+                img: "foto buku/tentang kamu.jpeg",
+                desc: "Judul: Tentang Kamu\nPenulis: Tere Liye\nKondisi Fisik: Grade B+ (Preloved Bagus).\nDetail: Bekas pemakaian wajar pada sudut sampul, bagian dalam utuh dan bersih."
+            },
+            {
+                id: 8,
+                title: "Pulang",
+                author: "Leila S. Chudori",
+                category: "Fiksi",
+                grade: "Grade A (Mulus)",
+                price: 60000,
+                img: "foto buku/pulang.jpeg",
+                desc: "Judul: Pulang\nPenulis: Leila S. Chudori (Penerbit KPG)\nKondisi Fisik: Grade A (Mulus Original)."
+            },
+            {
+                id: 9,
+                title: "Hujan",
+                author: "Tere Liye",
+                category: "Fiksi",
+                grade: "Grade A (Mulus)",
+                price: 50000,
+                img: "foto buku/hujan.jpeg",
+                desc: "Judul: Hujan\nPenulis: Tere Liye (Gramedia Pustaka Utama)\nKondisi Fisik: Grade A (Mulus Original)."
+            }
+        ];
+
+        let cart = [];
+        let selectedPdp = null;
+
+        window.onload = function() {
+            renderProducts(books);
+            renderAdminStock();
+        };
+
+        function navigate(page) {
+            ['home', 'pdp', 'cart', 'orders', 'returns', 'admin'].forEach(p => {
+                document.getElementById(`page-${p}`).classList.add('hidden');
+            });
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+        }
+
+        function filterCat(cat) {
+            if (cat === 'All') {
+                renderProducts(books);
+            } else {
+                const filtered = books.filter(b => b.category === cat);
+                renderProducts(filtered);
+            }
+        }
+
+        function handleSearch(query) {
+            const q = query.toLowerCase();
+            const filtered = books.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
+            renderProducts(filtered);
+        }
+
+        function renderProducts(list) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            list.forEach(b => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl border border-litera-surface overflow-hidden hover:shadow-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="h-64 bg-litera-bg relative cursor-pointer p-3 flex items-center justify-center" onclick="openPdp(${b.id})">
+                                <img src="${b.img}" class="max-h-full object-contain">
+                                <span class="absolute top-2 left-2 bg-white/90 text-litera-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">${b.category}</span>
+                                <span class="absolute top-2 right-2 bg-litera-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">${b.grade}</span>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <h3 onclick="openPdp(${b.id})" class="font-bold text-sm text-litera-black line-clamp-2 hover:text-litera-red cursor-pointer">${b.title}</h3>
+                                <p class="text-xs text-litera-gray">${b.author}</p>
+                                <span class="text-base font-extrabold text-litera-red block">Rp ${b.price.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <button onclick="addToCart(${b.id})" class="w-full bg-litera-surface text-litera-black hover:bg-litera-red hover:text-white py-2 rounded-xl text-xs font-bold transition-all">+ Keranjang</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openPdp(id) {
+            selectedPdp = books.find(b => b.id === id);
+            if (!selectedPdp) return;
+            document.getElementById('pdp-img').src = selectedPdp.img;
+            document.getElementById('pdp-title').innerText = selectedPdp.title;
+            document.getElementById('pdp-author').innerText = selectedPdp.author;
+            document.getElementById('pdp-category').innerText = selectedPdp.category;
+            document.getElementById('pdp-grade').innerText = selectedPdp.grade;
+            document.getElementById('pdp-price').innerText = `Rp ${selectedPdp.price.toLocaleString('id-ID')}`;
+            document.getElementById('pdp-desc').innerText = selectedPdp.desc;
+            navigate('pdp');
+        }
+
+        function addToCart(id) {
+            const item = books.find(b => b.id === id);
+            cart.push(item);
+            document.getElementById('cart-badge').innerText = cart.length;
+            updateCartSummary();
+            alert(`"${item.title}" ditambahkan ke keranjang!`);
+        }
+
+        function addCurrentPdpToCart() {
+            if (selectedPdp) {
+                addToCart(selectedPdp.id);
+            }
+        }
+
+        function addBundleToCart() {
+            addToCart(5); // Filsafat Sains
+            addToCart(1); // Risalah Kebangkitan
+            addToCart(6); // Filosofi Teras
+            navigate('cart');
+        }
+
+        function updateCartSummary() {
+            const container = document.getElementById('cart-summary-items');
+            container.innerHTML = '';
+            let subtotal = 0;
+            cart.forEach(c => {
+                subtotal += c.price;
+                container.innerHTML += `<div class="flex justify-between"><span>${c.title}</span><span class="font-bold">Rp ${c.price.toLocaleString('id-ID')}</span></div>`;
+            });
+            document.getElementById('subtotal-val').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            calculateShipping();
+        }
+
+        function calculateShipping() {
+            const region = document.getElementById('cust-region').value;
+            const courier = document.querySelector('input[name="courier"]:checked').value;
+            let ongkir = 8000;
+            if (courier === 'PICKUP') ongkir = 0;
+            else if (courier === 'JNE') ongkir = 10000;
+            if (region === 'Gowa' || region === 'Maros') ongkir += 2000;
+
+            document.getElementById('ongkir-val').innerText = `Rp ${ongkir.toLocaleString('id-ID')}`;
+            let subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
+            document.getElementById('total-val').innerText = `Rp ${(subtotal + ongkir).toLocaleString('id-ID')}`;
+        }
+
+        function processCheckout() {
+            if (cart.length === 0) {
+                alert("Keranjang masih kosong!");
+                return;
+            }
+            alert("Mengarahkan ke Midtrans Payment Gateway (QRIS Dinamis Generated)... Transaksi Berhasil!");
+            cart = [];
+            document.getElementById('cart-badge').innerText = "0";
+            navigate('orders');
+        }
+
+        function handleReturnSubmit(e) {
+            e.preventDefault();
+            alert("Pengajuan retur berhasil dikirim. Tim Operations LITERA akan memverifikasi video unboxing maks. 1x24 jam.");
+            navigate('home');
+        }
+
+        function renderAdminStock() {
+            const tbody = document.getElementById('admin-stock-tbody');
+            tbody.innerHTML = '';
+            books.forEach(b => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-4 font-bold text-litera-black">${b.title}</td>
+                        <td class="p-4 text-litera-dark">${b.category}</td>
+                        <td class="p-4 text-litera-dark">${b.grade}</td>
+                        <td class="p-4 font-bold text-litera-red">Rp ${b.price.toLocaleString('id-ID')}</td>
+                        <td class="p-4"><span class="bg-litera-surface text-litera-black px-2 py-0.5 rounded font-bold">1 Unit (Ready)</span></td>
+                        <td class="p-4 text-right"><button onclick="alert('Hapus stok')" class="text-litera-red font-bold">Hapus</button></td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
