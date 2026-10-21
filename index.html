@@ -606,15 +606,63 @@
             document.getElementById('total-val').innerText = `Rp ${(subtotal + ongkir).toLocaleString('id-ID')}`;
         }
 
+        // FUNGSI CHECKOUT TERBARU (TERHUBUNG KE DATABASE MYSQL / PHPADMIN)
         function processCheckout() {
             if (cart.length === 0) {
                 alert("Keranjang masih kosong!");
                 return;
             }
-            alert("Mengarahkan ke Midtrans Payment Gateway (QRIS Dinamis Generated)... Transaksi Berhasil!");
-            cart = [];
-            document.getElementById('cart-badge').innerText = "0";
-            navigate('orders');
+
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const region = document.getElementById('cust-region').value;
+            const address = document.getElementById('cust-address').value;
+            
+            const courierElem = document.querySelector('input[name="courier"]:checked');
+            const paymentElem = document.querySelector('input[name="payment"]:checked');
+
+            if (!name || !phone || !address || !courierElem || !paymentElem) {
+                alert("Harap lengkapi data pengiriman dan pembayaran!");
+                return;
+            }
+
+            const courier = courierElem.value;
+            const payment = paymentElem.value;
+            
+            let subtotal = cart.reduce((acc, curr) => acc + Number(curr.price), 0);
+            let ongkir = courier === 'PICKUP' ? 0 : (courier === 'JNE' ? 10000 : 8000);
+            if (region === 'Gowa' || region === 'Maros') ongkir += 2000;
+            let totalPrice = subtotal + ongkir;
+
+            // Kirim data pesanan ke backend Node.js untuk disimpan ke phpMyAdmin
+            fetch('http://localhost:3000/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customer_name: name,
+                    customer_phone: phone,
+                    region: region,
+                    address: address,
+                    courier: courier,
+                    payment_method: payment,
+                    total_price: totalPrice
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ Checkout Berhasil! `);
+                    cart = [];
+                    document.getElementById('cart-badge').innerText = "0";
+                    navigate('orders');
+                } else {
+                    alert("Gagal menyimpan transaksi ke database.");
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                alert("Gagal terhubung ke server backend lokal (Port 3000)!");
+            });
         }
 
         function handleReturnSubmit(e) {
